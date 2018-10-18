@@ -1,6 +1,5 @@
 package com.nobodyhub.learn.multiplication.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -9,11 +8,16 @@ import lombok.ToString;
  *
  * @author yan_h
  */
-@AllArgsConstructor
 @Getter
 @ToString
 public class Multiplication {
-    private int factorA;
-    private int factorB;
+    private final int factorA;
+    private final int factorB;
     private int result;
+
+    public Multiplication(int factorA, int factorB) {
+        this.factorA = factorA;
+        this.factorB = factorB;
+        this.result = factorA * factorB;
+    }
 }
