@@ -1,4 +1,4 @@
-package com.nobodyhub.learn.learnmicroserviceswithspringboot;
+package com.nobodyhub.learn.multiplication;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package com.nobodyhub.learn.learnmicroserviceswithspringboot;
+package com.nobodyhub.learn.multiplication;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
