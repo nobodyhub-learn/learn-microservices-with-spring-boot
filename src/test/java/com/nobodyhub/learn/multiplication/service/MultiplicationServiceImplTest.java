@@ -1,6 +1,8 @@
 package com.nobodyhub.learn.multiplication.service;
 
 import com.nobodyhub.learn.multiplication.domain.Multiplication;
+import com.nobodyhub.learn.multiplication.domain.MultiplicationResultAttempt;
+import com.nobodyhub.learn.multiplication.domain.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -34,7 +36,31 @@ public class MultiplicationServiceImplTest {
         Multiplication multiplication = multiplicationServiceImpl.createRandomMultiplication();
         //assert
         assertThat(multiplication.getFactorA()).isEqualTo(50);
-        assertThat(multiplication.getFactorA()).isEqualTo(30);
-        assertThat(multiplication.getFactorA()).isEqualTo(1500);
+        assertThat(multiplication.getFactorB()).isEqualTo(30);
+        assertThat(multiplication.getResult()).isEqualTo(1500);
+    }
+
+    @Test
+    public void checkCorrectAttempTest() {
+        //given
+        Multiplication multiplication = new Multiplication(50, 60);
+        User user = new User("yan");
+        MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3000);
+        //when
+        boolean attempResult = multiplicationServiceImpl.checkAttempt(attempt);
+        //assert
+        assertThat(attempResult).isTrue();
+    }
+
+    @Test
+    public void checkWrongAttemptTest() {
+        //given
+        Multiplication multiplication = new Multiplication(50, 60);
+        User user = new User("yan");
+        MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3010);
+        //when
+        boolean attempResult = multiplicationServiceImpl.checkAttempt(attempt);
+        //assert
+        assertThat(attempResult).isFalse();
     }
 }

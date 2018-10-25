@@ -2,7 +2,6 @@ package com.nobodyhub.learn.multiplication.domain;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -10,7 +9,6 @@ import lombok.ToString;
  *
  * @author yan_h
  */
-@RequiredArgsConstructor
 @Getter
 @ToString
 @EqualsAndHashCode
@@ -22,5 +20,11 @@ public final class Multiplication {
     // Empty constructor for JSON (de)serialization
     protected Multiplication() {
         this(0, 0);
+    }
+
+    public Multiplication(int factorA, int factorB) {
+        this.factorA = factorA;
+        this.factorB = factorB;
+        this.result = factorA * factorB;
     }
 }
