@@ -1,6 +1,7 @@
 package com.nobodyhub.learn.multiplication.service;
 
 import com.nobodyhub.learn.multiplication.domain.Multiplication;
+import com.nobodyhub.learn.multiplication.domain.MultiplicationResultAttempt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,5 +21,10 @@ public class MultiplicationServiceImpl implements MultiplicationService {
         int factorA = randomGeneratorService.generateRandomFactor();
         int factorB = randomGeneratorService.generateRandomFactor();
         return new Multiplication(factorA, factorB);
+    }
+
+    @Override
+    public boolean checkAttempt(MultiplicationResultAttempt resultAttempt) {
+        return false;
     }
 }
