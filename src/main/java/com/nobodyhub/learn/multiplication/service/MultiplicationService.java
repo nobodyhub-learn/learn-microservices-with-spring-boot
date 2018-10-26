@@ -16,9 +16,9 @@ public interface MultiplicationService {
      */
     Multiplication createRandomMultiplication();
     /**
-     * @return true if the attempt matches the result of the
+     * @return a new MultiplicationResultAttempt with correct true if the attempt matches the result of the
      * multiplication, false otherwise.
      */
-    boolean checkAttempt(final MultiplicationResultAttempt
+    MultiplicationResultAttempt checkAttempt(final MultiplicationResultAttempt
                                  resultAttempt);
 }

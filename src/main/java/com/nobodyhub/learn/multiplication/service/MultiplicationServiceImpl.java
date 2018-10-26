@@ -4,6 +4,7 @@ import com.nobodyhub.learn.multiplication.domain.Multiplication;
 import com.nobodyhub.learn.multiplication.domain.MultiplicationResultAttempt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 /**
  * @author yan_h
@@ -24,9 +25,16 @@ public class MultiplicationServiceImpl implements MultiplicationService {
     }
 
     @Override
-    public boolean checkAttempt(MultiplicationResultAttempt resultAttempt) {
-        return resultAttempt.getResultAttempt() ==
+    public MultiplicationResultAttempt checkAttempt(MultiplicationResultAttempt resultAttempt) {
+        boolean correct = resultAttempt.getResultAttempt() ==
                 resultAttempt.getMultiplication().getFactorA() *
                         resultAttempt.getMultiplication().getFactorB();
+        // Avoids 'hack' attempts
+        Assert.isTrue(!resultAttempt.isCorrect(), "You can't send an attempt marked as correct!!");
+        // Creates a copy, now setting the 'correct' field accordingly
+        return new MultiplicationResultAttempt(resultAttempt.getUser(),
+                resultAttempt.getMultiplication(),
+                resultAttempt.getResultAttempt(),
+                correct);
     }
 }
