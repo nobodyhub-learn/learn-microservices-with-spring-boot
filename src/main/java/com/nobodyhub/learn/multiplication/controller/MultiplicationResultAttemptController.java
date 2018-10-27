@@ -4,10 +4,9 @@ import com.nobodyhub.learn.multiplication.domain.MultiplicationResultAttempt;
 import com.nobodyhub.learn.multiplication.service.MultiplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author yan_h
@@ -23,7 +22,14 @@ public final class MultiplicationResultAttemptController {
     }
 
     @PostMapping
-    ResponseEntity<MultiplicationResultAttempt> postResult(@RequestBody MultiplicationResultAttempt attempt) {
+    public ResponseEntity<MultiplicationResultAttempt> postResult(@RequestBody MultiplicationResultAttempt attempt) {
         return ResponseEntity.ok(multiplicationService.checkAttempt(attempt));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<MultiplicationResultAttempt>> getStatistics(@RequestParam("alias") String alias) {
+        return ResponseEntity.ok(
+                multiplicationService.getStatsForUser(alias)
+        );
     }
 }

@@ -3,13 +3,20 @@ package com.nobodyhub.learn.multiplication.service;
 import com.nobodyhub.learn.multiplication.domain.Multiplication;
 import com.nobodyhub.learn.multiplication.domain.MultiplicationResultAttempt;
 import com.nobodyhub.learn.multiplication.domain.User;
+import com.nobodyhub.learn.multiplication.repository.MultiplicationResultAttemptRepository;
+import com.nobodyhub.learn.multiplication.repository.UserRepository;
+import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author yan_h
@@ -19,13 +26,16 @@ public class MultiplicationServiceImplTest {
 
     @Mock
     private RandomGeneratorService randomGeneratorService;
+    @Mock
+    private MultiplicationResultAttemptRepository attemptRepository;
+    @Mock
+    private UserRepository userRepository;
 
     @Before
     public void setUp() {
         // With this call to initMocks we tell Mockito to process the annotations
         MockitoAnnotations.initMocks(this);
-        multiplicationServiceImpl = new MultiplicationServiceImpl
-                (randomGeneratorService);
+        multiplicationServiceImpl = new MultiplicationServiceImpl(randomGeneratorService, attemptRepository, userRepository);
     }
 
     @Test
@@ -45,11 +55,14 @@ public class MultiplicationServiceImplTest {
         //given
         Multiplication multiplication = new Multiplication(50, 60);
         User user = new User("yan");
-        MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3000, true);
+        MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3000, false);
+        MultiplicationResultAttempt verifiedAttempt = new MultiplicationResultAttempt(user, multiplication, 3000, true);
+        given(userRepository.findByAlias("yan")).willReturn(Optional.empty());
         //when
         MultiplicationResultAttempt attempResult = multiplicationServiceImpl.checkAttempt(attempt);
         //assert
         assertThat(attempResult.isCorrect()).isTrue();
+        verify(attemptRepository).save(verifiedAttempt);
     }
 
     @Test
@@ -58,10 +71,12 @@ public class MultiplicationServiceImplTest {
         Multiplication multiplication = new Multiplication(50, 60);
         User user = new User("yan");
         MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3010, false);
+        given(userRepository.findByAlias("yan")).willReturn(Optional.empty());
         //when
         MultiplicationResultAttempt attempResult = multiplicationServiceImpl.checkAttempt(attempt);
         //assert
         assertThat(attempResult.isCorrect()).isFalse();
+        verify(attemptRepository).save(attempt);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -72,5 +87,21 @@ public class MultiplicationServiceImplTest {
         MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3010, true);
         //when
         multiplicationServiceImpl.checkAttempt(attempt);
+    }
+
+    @Test
+    public void retrieveStatsTest() {
+        //given
+        Multiplication multiplication = new Multiplication(50, 60);
+        User user = new User("yan");
+        MultiplicationResultAttempt attempt1 = new MultiplicationResultAttempt(user, multiplication, 3010, false);
+        MultiplicationResultAttempt attempt2 = new MultiplicationResultAttempt(user, multiplication, 3051, false);
+        List<MultiplicationResultAttempt> latestAttempts = Lists.newArrayList(attempt1, attempt2);
+        given(userRepository.findByAlias("yan")).willReturn(Optional.empty());
+        given(attemptRepository.findTop5ByUserAliasOrderByIdDesc("yan")).willReturn(latestAttempts);
+        //when
+        List<MultiplicationResultAttempt> latestAttemptResult = multiplicationServiceImpl.getStatsForUser("yan");
+        //then
+        assertThat(latestAttemptResult).isEqualTo(latestAttempts);
     }
 }
