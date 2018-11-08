@@ -1,0 +1,5 @@
+com\nobodyhub\learn\multiplication\service\MultiplicationService.class
+com\nobodyhub\learn\multiplication\service\RandomGeneratorServiceImpl.class
+com\nobodyhub\learn\multiplication\service\RandomGeneratorService.class
+com\nobodyhub\learn\multiplication\LearnMicroservicesWithSpringBootApplication.class
+com\nobodyhub\learn\multiplication\domain\Multiplication.class

@@ -1,0 +1,4 @@
+com\nobodyhub\learn\multiplication\service\MultiplicationServiceTest.class
+com\nobodyhub\learn\multiplication\LearnMicroservicesWithSpringBootApplicationTests.class
+com\nobodyhub\learn\multiplication\service\RandomGeneratorServiceTest.class
+com\nobodyhub\learn\multiplication\service\RandomGeneratorServiceImplTest.class
