@@ -3,6 +3,8 @@ package com.nobodyhub.learn.multiplication.service;
 import com.nobodyhub.learn.multiplication.domain.Multiplication;
 import com.nobodyhub.learn.multiplication.domain.MultiplicationResultAttempt;
 import com.nobodyhub.learn.multiplication.domain.User;
+import com.nobodyhub.learn.multiplication.event.EventDispatcher;
+import com.nobodyhub.learn.multiplication.event.MultiplicationSolvedEvent;
 import com.nobodyhub.learn.multiplication.repository.MultiplicationResultAttemptRepository;
 import com.nobodyhub.learn.multiplication.repository.UserRepository;
 import org.assertj.core.util.Lists;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -30,12 +33,15 @@ public class MultiplicationServiceImplTest {
     private MultiplicationResultAttemptRepository attemptRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private EventDispatcher eventDispatcher;
+
 
     @Before
     public void setUp() {
         // With this call to initMocks we tell Mockito to process the annotations
         MockitoAnnotations.initMocks(this);
-        multiplicationServiceImpl = new MultiplicationServiceImpl(randomGeneratorService, attemptRepository, userRepository);
+        multiplicationServiceImpl = new MultiplicationServiceImpl(randomGeneratorService, attemptRepository, userRepository, eventDispatcher);
     }
 
     @Test
@@ -57,12 +63,15 @@ public class MultiplicationServiceImplTest {
         User user = new User("yan");
         MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3000, false);
         MultiplicationResultAttempt verifiedAttempt = new MultiplicationResultAttempt(user, multiplication, 3000, true);
+        MultiplicationSolvedEvent event = new MultiplicationSolvedEvent(attempt.getId(),
+                attempt.getUser().getId(), true);
         given(userRepository.findByAlias("yan")).willReturn(Optional.empty());
         //when
         MultiplicationResultAttempt attempResult = multiplicationServiceImpl.checkAttempt(attempt);
         //assert
         assertThat(attempResult.isCorrect()).isTrue();
         verify(attemptRepository).save(verifiedAttempt);
+        verify(eventDispatcher).send(eq(event));
     }
 
     @Test
@@ -71,12 +80,15 @@ public class MultiplicationServiceImplTest {
         Multiplication multiplication = new Multiplication(50, 60);
         User user = new User("yan");
         MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(user, multiplication, 3010, false);
+        MultiplicationSolvedEvent event = new MultiplicationSolvedEvent(attempt.getId(),
+                attempt.getUser().getId(), false);
         given(userRepository.findByAlias("yan")).willReturn(Optional.empty());
         //when
         MultiplicationResultAttempt attempResult = multiplicationServiceImpl.checkAttempt(attempt);
         //assert
         assertThat(attempResult.isCorrect()).isFalse();
         verify(attemptRepository).save(attempt);
+        verify(eventDispatcher).send(eq(event));
     }
 
     @Test(expected = IllegalArgumentException.class)
