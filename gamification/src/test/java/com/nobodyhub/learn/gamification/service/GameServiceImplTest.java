@@ -69,7 +69,7 @@ public class GameServiceImplTest {
         given(badgeCardRepository.findByUserIdOrderByBadgeTimestampDesc(userId))
                 .willReturn(Collections.singletonList(firstWonBadge));
         //when
-        GameStats iteration = gameService.retrieveStatsForUser(userId);
+        GameStats iteration = gameService.newAttemptForUser(userId, attemptId, true);
         //then
         assertThat(iteration.getScore()).isEqualTo(ScoreCard.DEFAULT_SCORE);
         assertThat(iteration.getBadges()).containsOnly(Badge.BRONZE_MULTIPLICATOR);
@@ -114,6 +114,6 @@ public class GameServiceImplTest {
         GameStats stats = gameService.retrieveStatsForUser(userId);
         //then
         assertThat(stats.getScore()).isEqualTo(totalScore);
-        assertThat(stats.getBadges()).isEqualTo(Badge.SILVER_MULTIPLICATOR);
+        assertThat(stats.getBadges()).containsOnly(Badge.SILVER_MULTIPLICATOR);
     }
 }

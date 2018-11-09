@@ -2,8 +2,10 @@ package com.nobodyhub.learn.gamification.service;
 
 import com.nobodyhub.learn.gamification.domain.LeaderBoardRow;
 import com.nobodyhub.learn.gamification.repository.ScoreCardRepository;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +21,12 @@ public class LeaderBoardServiceImplTest {
 
     @Mock
     private ScoreCardRepository scoreCardRepository;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        this.leaderBoardService = new LeaderBoardServiceImpl(scoreCardRepository);
+    }
 
     @Test
     public void getCurrentLeaderBoardTest() {
