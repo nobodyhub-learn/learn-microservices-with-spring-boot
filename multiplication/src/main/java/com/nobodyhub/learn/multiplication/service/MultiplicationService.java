@@ -29,4 +29,12 @@ public interface MultiplicationService {
      * @return the latest check result for user with given alias
      */
     List<MultiplicationResultAttempt> getStatsForUser(String userAlias);
+
+    /**
+     * Gets an attempt by its id
+     *
+     * @param resultId the identifier of the attempt
+     * @return the {@link MultiplicationResultAttempt} object matching the id, otherwise null.
+     */
+    MultiplicationResultAttempt getResultById(Long resultId);
 }
