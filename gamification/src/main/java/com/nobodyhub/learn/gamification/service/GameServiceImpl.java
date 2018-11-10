@@ -1,5 +1,7 @@
 package com.nobodyhub.learn.gamification.service;
 
+import com.nobodyhub.learn.gamification.client.MultiplicationResultAttemptClient;
+import com.nobodyhub.learn.gamification.client.dto.MultiplicationResultAttempt;
 import com.nobodyhub.learn.gamification.domain.Badge;
 import com.nobodyhub.learn.gamification.domain.BadgeCard;
 import com.nobodyhub.learn.gamification.domain.GameStats;
@@ -23,14 +25,19 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class GameServiceImpl implements GameService {
+    public static final int LUCKY_NUMBER = 42;
+
     private final ScoreCardRepository scoreCardRepository;
     private final BadgeCardRepository badgeCardRepository;
+    private final MultiplicationResultAttemptClient attemptClient;
 
     @Autowired
     public GameServiceImpl(final ScoreCardRepository scoreCardRepository,
-                           final BadgeCardRepository badgeCardRepository) {
+                           final BadgeCardRepository badgeCardRepository,
+                           final MultiplicationResultAttemptClient attemptClient) {
         this.scoreCardRepository = scoreCardRepository;
         this.badgeCardRepository = badgeCardRepository;
+        this.attemptClient = attemptClient;
     }
 
     @Override
@@ -66,16 +73,26 @@ public class GameServiceImpl implements GameService {
         log.info("New score for user {} is {}", userId, totalScore);
         List<ScoreCard> scoreCardList = scoreCardRepository.findByUserIdOrderByScoreTimestampDesc(userId);
         List<BadgeCard> badgeCardList = badgeCardRepository.findByUserIdOrderByBadgeTimestampDesc(userId);
+        // Badges depending on score
         checkAndGiveBadgeBasedOnScore(badgeCardList, Badge.BRONZE_MULTIPLICATOR, totalScore, 100, userId)
                 .ifPresent(badgeCards::add);
         checkAndGiveBadgeBasedOnScore(badgeCardList, Badge.SILVER_MULTIPLICATOR, totalScore, 500, userId)
                 .ifPresent(badgeCards::add);
         checkAndGiveBadgeBasedOnScore(badgeCardList, Badge.GOLD_MULTIPLICATOR, totalScore, 999, userId)
                 .ifPresent(badgeCards::add);
+        // First won badge
         if (scoreCardList.size() == 1 &&
                 !containsBadge(badgeCardList, Badge.FIRST_WON)) {
             BadgeCard firstWonBadge = giveBadgeToUser(Badge.FIRST_WON, userId);
             badgeCards.add(firstWonBadge);
+        }
+        // Lucky number badge
+        MultiplicationResultAttempt attempt = attemptClient.retrieveMultiplicationResultAttemptById(attemptId);
+        if (!containsBadge(badgeCardList, Badge.LUCKY_NUMBER) &&
+                (LUCKY_NUMBER == attempt.getMultiplicationFactorA() ||
+                        LUCKY_NUMBER == attempt.getMultiplicationFactorB())) {
+            BadgeCard luckyNumberBadge = giveBadgeToUser(Badge.LUCKY_NUMBER, userId);
+            badgeCards.add(luckyNumberBadge);
         }
         return badgeCards;
     }

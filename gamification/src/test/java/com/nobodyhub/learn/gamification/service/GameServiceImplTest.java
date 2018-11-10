@@ -1,5 +1,7 @@
 package com.nobodyhub.learn.gamification.service;
 
+import com.nobodyhub.learn.gamification.client.MultiplicationResultAttemptClient;
+import com.nobodyhub.learn.gamification.client.dto.MultiplicationResultAttempt;
 import com.nobodyhub.learn.gamification.domain.Badge;
 import com.nobodyhub.learn.gamification.domain.BadgeCard;
 import com.nobodyhub.learn.gamification.domain.GameStats;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -28,11 +31,21 @@ public class GameServiceImplTest {
     private ScoreCardRepository scoreCardRepository;
     @Mock
     private BadgeCardRepository badgeCardRepository;
+    @Mock
+    private MultiplicationResultAttemptClient attemptClient;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.gameService = new GameServiceImpl(scoreCardRepository, badgeCardRepository);
+        this.gameService = new GameServiceImpl(scoreCardRepository, badgeCardRepository, attemptClient);
+        MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(
+                "yan",
+                20,
+                70,
+                1400,
+                true);
+        given(attemptClient.retrieveMultiplicationResultAttemptById(anyLong()))
+                .willReturn(attempt);
     }
 
     @Test
@@ -99,6 +112,33 @@ public class GameServiceImplTest {
                 .collect(Collectors.toList());
     }
 
+    @Test
+    public void newAttemptForUserTest_LuckyNumber() {
+        // given
+        Long userId = 1L;
+        Long attemptId = 29L;
+        int totalScore = 10;
+        BadgeCard firstWonBadge = new BadgeCard(userId, Badge.FIRST_WON);
+        given(scoreCardRepository.getTotalScoreForUser(userId))
+                .willReturn(totalScore);
+        given(scoreCardRepository.findByUserIdOrderByScoreTimestampDesc(userId))
+                .willReturn(createNScoreCards(1, userId));
+        given(badgeCardRepository.findByUserIdOrderByBadgeTimestampDesc(userId))
+                .willReturn(Collections.singletonList(firstWonBadge));
+        MultiplicationResultAttempt attempt = new MultiplicationResultAttempt(
+                "yan",
+                42,
+                10,
+                420,
+                true);
+        given(attemptClient.retrieveMultiplicationResultAttemptById(attemptId))
+                .willReturn(attempt);
+        // when
+        GameStats iteration = gameService.newAttemptForUser(userId, attemptId, true);
+        // then
+        assertThat(iteration.getScore()).isEqualTo(ScoreCard.DEFAULT_SCORE);
+        assertThat(iteration.getBadges()).containsOnly(Badge.LUCKY_NUMBER);
+    }
 
     @Test
     public void retrieveStatsForUserTest() {
