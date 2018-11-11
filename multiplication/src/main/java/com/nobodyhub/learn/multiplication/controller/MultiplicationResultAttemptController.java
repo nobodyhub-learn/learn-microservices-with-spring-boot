@@ -33,7 +33,7 @@ public final class MultiplicationResultAttemptController {
         );
     }
 
-    @GetMapping("/resultId")
+    @GetMapping("/{resultId}")
     ResponseEntity<MultiplicationResultAttempt> getResultById(
             @PathVariable("resultId") Long resultId) {
         return ResponseEntity.ok(multiplicationService.getResultById(resultId));

@@ -28,7 +28,7 @@ public interface ScoreCardRepository extends CrudRepository<ScoreCard, Long> {
      *
      * @return the leader board, sorted by the highest score first
      */
-    @Query("SELECT NEW com.nobodyhub.learn.gamification.domain.LeaderBoardRow(s.userId, SUM(s.score)) FROM ScoreCard s GROUP BY s.userId ORDER BY SUM(S.score) DESC")
+    @Query("SELECT NEW com.nobodyhub.learn.gamification.domain.LeaderBoardRow(s.userId, SUM(s.score)) FROM ScoreCard s GROUP BY s.userId ORDER BY SUM(s.score) DESC")
     List<LeaderBoardRow> findFirst10();
 
     /**
