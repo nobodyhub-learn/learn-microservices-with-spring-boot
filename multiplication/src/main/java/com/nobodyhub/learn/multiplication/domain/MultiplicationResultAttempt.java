@@ -31,6 +31,7 @@ public final class MultiplicationResultAttempt {
     @JoinColumn(name = "MULTIPLICATION_ID")
     private final Multiplication multiplication;
     private final int resultAttempt;
+
     private final boolean correct;
 
     // Empty constructor for JSON (de)serialization
